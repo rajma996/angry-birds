@@ -2,7 +2,11 @@
 #include <time.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+using namespace std;
 
+#define loop(i,a,b) for(int i=a;i<b;i++)
+
+// #define push_back pb;
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
@@ -11,11 +15,9 @@
 #include "construct3D.h"
 #include "rectangle.h"
 #include "circle.h"
+#include "score.h"
 
-#define loop(i,a,b) for(int i=a;i<b;i++)
-#define lower_limit -300
 
-using namespace std;
 
 
 vector<VAO> balls;
@@ -119,13 +121,13 @@ void quit(GLFWwindow *window)
 
 void releaseball()
 {
-  if(balls.size()==0)
-  {
+  // if(balls.size()==0)
+  // {
     balls.push_back(*create_circle(canon[1].trans[0],canon[1].trans[1],10,10,0,1,0,1));
     int t = balls.size();
     balls[t-1].vx=55*cos(canon[0].rotate_angle*M_PI/180)*((float)power/66);
     balls[t-1].vy=40*sin(canon[0].rotate_angle*M_PI/180)*((float)power/66);
-  }
+  // }
 }
 void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -259,12 +261,12 @@ void checkkeys()
   if(keys['W'-'A']==1 && canon[0].trans[1]<250 && canon[0].trans[0]>=-570 && canon[0].trans[0]<-530)
   {
     canon[0].trans[1]++; canon[1].trans[1]++; stand[0].trans[1]++; stand[1].trans[1]++;
-    stand[2]=*create_rectangle(stand[1].trans[0],(stand[1].trans[1]-400)/2,10,(stand[1].trans[1]+400)/2,0,0,0,0);
+    stand[2]=*create_rectangle(stand[1].trans[0],(stand[1].trans[1]-400)/2,10,(stand[1].trans[1]+400)/2,0,0,0,0,0,0);
   }
   if(keys['S'-'A']==1 && canon[0].trans[1]>-250 && canon[0].trans[0]>=-570 && canon[0].trans[0]<-530)
   {
     canon[0].trans[1]--; canon[1].trans[1]--; stand[0].trans[1]--; stand[1].trans[1]--;
-    stand[2]=*create_rectangle(stand[1].trans[0],(stand[1].trans[1]-400)/2,10,(stand[1].trans[1]+400)/2,0,0,0,0);
+    stand[2]=*create_rectangle(stand[1].trans[0],(stand[1].trans[1]-400)/2,10,(stand[1].trans[1]+400)/2,0,0,0,0,0,0);
   }
 }
 
@@ -272,7 +274,7 @@ void checkpower()
 {
   int i=power_arr.size()-1;
   if(power_state==1)
-  power_arr.push_back(*create_rectangle(620,-392+i*8,10,4,0,(float)i/100,(100-(float)i)/100,0));
+  power_arr.push_back(*create_rectangle(620,-392+i*8,10,4,0,(float)i/100,0,(100-(float)i)/100,0,0));
   else power_arr.pop_back();
 }
 void draw ()
@@ -321,8 +323,20 @@ void draw ()
     construct(balls[i]);
   }
   loop(i,0,power_arr.size()) construct(power_arr[i]);
-  /* Render your scene */
-
+	score_value++;
+	if(score_value==0) {  display_digit(0,600,200); display_score(); }
+	else
+	{
+		int score_temp = score_value;
+		int temp_x = 570;
+		while(score_temp!=0)
+		{
+				score.clear();
+				display_digit(score_temp%10,temp_x,350);
+				score_temp/=10; temp_x-=(2*lengthx+10);
+				display_score();
+		}
+	}
 }
 
 /* Initialise glfw window, I/O callbacks and the renderer to use */
@@ -392,13 +406,14 @@ void initGL (GLFWwindow* window, int width, int height)
     /* Objects should be created before any other gl function and shaders */
 	// Create the models
   for (int i=0;i<26;i++) keys[i]=0;
-  stand.push_back(*create_rectangle(-570,-300,30,10,90,0,0,0));
-  stand.push_back(*create_rectangle(-570,-340,50,10,0,0,0,0));
-  stand.push_back(*create_rectangle(-570,-370,10,60,0,0,0,0));
-  canon.push_back(*create_rectangle(-570,-250,80,20,45,0,1,0));
+  stand.push_back(*create_rectangle(-570,-300,30,10,90,0,0,0,0,0));
+  stand.push_back(*create_rectangle(-570,-340,50,10,0,0,0,0,0,0));
+  stand.push_back(*create_rectangle(-570,-370,10,60,0,0,0,0,0,0));
+  canon.push_back(*create_rectangle(-570,-250,80,20,45,0,1,0,0,0));
   canon.push_back(*create_circle(-570,-250,40,40,0,1,0,0));
   power = 0;
   power_state=1;
+	score_value = 0;
   createobstructions();
 	// Create and compile our GLSL program from the shaders
 	programID = LoadShaders( "Sample_GL.vert", "Sample_GL.frag" );

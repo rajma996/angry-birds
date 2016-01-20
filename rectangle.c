@@ -1,6 +1,6 @@
 #include "rectangle.h"
 
-VAO* create_rectangle(float x,float y,float a,float b,float angle,float red,float green , float blue,float vx=0,float vy=0 )
+VAO* create_rectangle(float x,float y,float a,float b,float angle,float red,float blue , float green,float vx, float vy )
 {
   GLfloat vertex_buffer_data[100];
   int i=0,j=0;
