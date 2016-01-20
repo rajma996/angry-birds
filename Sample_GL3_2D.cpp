@@ -8,37 +8,15 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "construct3D.h"
+#include "rectangle.h"
+#include "circle.h"
+
 #define loop(i,a,b) for(int i=a;i<b;i++)
 #define lower_limit -300
 
 using namespace std;
 
-struct VAO {
-    GLuint VertexArrayID;
-    GLuint VertexBuffer;
-    GLuint ColorBuffer;
-    float trans[3];
-    float rotate_angle;
-    float sizex;
-    float sizey;
-    float vx;
-    float vy;
-    float starttime;
-    GLenum PrimitiveMode;
-    GLenum FillMode;
-    int NumVertices;
-};
-typedef struct VAO VAO;
-
-
-struct GLMatrices {
-	glm::mat4 projection;
-	glm::mat4 model;
-	glm::mat4 view;
-	GLuint MatrixID;
-} Matrices;
-
-VAO* create_circle(float x,float y,float a,float b,float angle,float red,float green , float blue);
 
 vector<VAO> balls;
 vector<VAO> stand;
@@ -48,7 +26,6 @@ vector<VAO> obstructions;
 int power;
 bool power_state;
 bool keys[26];
-GLuint programID;
 
 /* Function to load Shaders - Use it as it is */
 GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path) {
@@ -140,88 +117,6 @@ void quit(GLFWwindow *window)
 }
 
 
-/* Generate VAO, VBOs and return VAO handle */
-struct VAO* create3DObject (GLenum primitive_mode, int numVertices, const GLfloat* vertex_buffer_data, const GLfloat* color_buffer_data, GLenum fill_mode=GL_FILL)
-{
-    struct VAO* vao = new struct VAO;
-    vao->PrimitiveMode = primitive_mode;
-    vao->NumVertices = numVertices;
-    vao->FillMode = fill_mode;
-
-    // Create Vertex Array Object
-    // Should be done after CreateWindow and before any other GL calls
-    glGenVertexArrays(1, &(vao->VertexArrayID)); // VAO
-    glGenBuffers (1, &(vao->VertexBuffer)); // VBO - vertices
-    glGenBuffers (1, &(vao->ColorBuffer));  // VBO - colors
-
-    glBindVertexArray (vao->VertexArrayID); // Bind the VAO
-    glBindBuffer (GL_ARRAY_BUFFER, vao->VertexBuffer); // Bind the VBO vertices
-    glBufferData (GL_ARRAY_BUFFER, 3*numVertices*sizeof(GLfloat), vertex_buffer_data, GL_STATIC_DRAW); // Copy the vertices into VBO
-    glVertexAttribPointer(
-                          0,                  // attribute 0. Vertices
-                          3,                  // size (x,y,z)
-                          GL_FLOAT,           // type
-                          GL_FALSE,           // normalized?
-                          0,                  // stride
-                          (void*)0            // array buffer offset
-                          );
-
-    glBindBuffer (GL_ARRAY_BUFFER, vao->ColorBuffer); // Bind the VBO colors
-    glBufferData (GL_ARRAY_BUFFER, 3*numVertices*sizeof(GLfloat), color_buffer_data, GL_STATIC_DRAW);  // Copy the vertex colors
-    glVertexAttribPointer(
-                          1,                  // attribute 1. Color
-                          3,                  // size (r,g,b)
-                          GL_FLOAT,           // type
-                          GL_FALSE,           // normalized?
-                          0,                  // stride
-                          (void*)0            // array buffer offset
-                          );
-
-    return vao;
-}
-
-/* Generate VAO, VBOs and return VAO handle - Common Color for all vertices */
-struct VAO* create3DObject (GLenum primitive_mode, int numVertices, const GLfloat* vertex_buffer_data, const GLfloat red, const GLfloat green, const GLfloat blue, GLenum fill_mode=GL_FILL)
-{
-    GLfloat* color_buffer_data = new GLfloat [3*numVertices];
-    for (int i=0; i<numVertices; i++) {
-        color_buffer_data [3*i] = red;
-        color_buffer_data [3*i + 1] = green;
-        color_buffer_data [3*i + 2] = blue;
-    }
-
-    return create3DObject(primitive_mode, numVertices, vertex_buffer_data, color_buffer_data, fill_mode);
-}
-
-/* Render the VBOs handled by VAO */
-void draw3DObject (struct VAO* vao)
-{
-    // Change the Fill Mode for this object
-    glPolygonMode (GL_FRONT_AND_BACK, vao->FillMode);
-
-    // Bind the VAO to use
-    glBindVertexArray (vao->VertexArrayID);
-
-    // Enable Vertex Attribute 0 - 3d Vertices
-    glEnableVertexAttribArray(0);
-    // Bind the VBO to use
-    glBindBuffer(GL_ARRAY_BUFFER, vao->VertexBuffer);
-
-    // Enable Vertex Attribute 1 - Color
-    glEnableVertexAttribArray(1);
-    // Bind the VBO to use
-    glBindBuffer(GL_ARRAY_BUFFER, vao->ColorBuffer);
-
-    // Draw the geometry !
-    glDrawArrays(vao->PrimitiveMode, 0, vao->NumVertices); // Starting from vertex 0; 3 vertices total -> 1 triangle
-}
-
-/**************************
- * Customizable functions *
- **************************/
-
-/* Executed when a regular key is pressed/released/held-down */
-/* Prefered for Keyboard events */
 void releaseball()
 {
   if(balls.size()==0)
@@ -350,63 +245,9 @@ void reshapeWindow (GLFWwindow* window, int width, int height)
 }
 
 // Creates the triangle object used in this sample code
-float camera_rotation_angle = 90;
-VAO* create_rectangle(float x,float y,float a,float b,float angle,float red,float green , float blue,float vx=0,float vy=0 )
-{
-  GLfloat vertex_buffer_data[100];
-  int i=0,j=0;
-  vertex_buffer_data[i++]=a;vertex_buffer_data[i++]=b;vertex_buffer_data[i++]=0;
-  vertex_buffer_data[i++]=-1*a;vertex_buffer_data[i++]=-1*b;vertex_buffer_data[i++]=0;
-  vertex_buffer_data[i++]=a;vertex_buffer_data[i++]=-1*b;vertex_buffer_data[i++]=0;
-  vertex_buffer_data[i++]=-1*a;vertex_buffer_data[i++]=b;vertex_buffer_data[i++]=0;
-  vertex_buffer_data[i++]=-1*a;vertex_buffer_data[i++]=-1*b;vertex_buffer_data[i++]=0;
-  vertex_buffer_data[i++]=a;vertex_buffer_data[i++]=b;vertex_buffer_data[i++]=0;
-  GLfloat color_buffer_data [100];j=0;
-  for(int i=1;i<=6;i++)
-  {
-    color_buffer_data[j++]=red;color_buffer_data[j++]=green;color_buffer_data[j++]=blue;
-    color_buffer_data[j++]=red;color_buffer_data[j++]=green;color_buffer_data[j++]=blue;
-    color_buffer_data[j++]=red;color_buffer_data[j++]=green;color_buffer_data[j++]=blue;
-  }
-  struct VAO* vao = new struct VAO;
-  vao = create3DObject(GL_TRIANGLES, 6 , vertex_buffer_data, color_buffer_data, GL_FILL);
-  vao->trans[0]=x; vao->trans[1]=y; vao->trans[2]=0; vao->sizex=a; vao->sizey=b;
-  vao->rotate_angle=angle; vao->starttime=glfwGetTime(); vao->vx=vx; vao->vy=vy; vao->starttime=glfwGetTime();
-  return vao;
 
-}
 /* Render the scene with openGL */
 /* Edit this function according to your assignment */
-VAO* create_circle(float x,float y,float a,float b,float angle,float red,float green , float blue)
-{
-  GLfloat vertex_buffer_data[650];
-  int i=0,j=0;
-  for (i=1;i<=72;i++)
-  {
-      int angle = i*5;
-      vertex_buffer_data[j++]=a*cos((angle*(3.14159265))/180);
-      vertex_buffer_data[j++]=b*sin((angle*(3.14159265))/180);
-      vertex_buffer_data[j++]=0;
-      vertex_buffer_data[j++]=0;
-      vertex_buffer_data[j++]=0;
-      vertex_buffer_data[j++]=0;
-      vertex_buffer_data[j++]=a*cos(((angle-5)*(3.14159265))/180);
-      vertex_buffer_data[j++]=b*sin(((angle-5)*(3.14159265))/180);
-      vertex_buffer_data[j++]=0;
-  }
-  GLfloat color_buffer_data [650];j=0;
-  for (int r=1;r<=72;r++)
-  {
-    color_buffer_data[j++]=red;color_buffer_data[j++]=green;color_buffer_data[j++]=blue;
-    color_buffer_data[j++]=red;color_buffer_data[j++]=green;color_buffer_data[j++]=blue;
-    color_buffer_data[j++]=red;color_buffer_data[j++]=green;color_buffer_data[j++]=blue;
-  }
-  struct VAO* vao = new struct VAO;
-  vao = create3DObject(GL_TRIANGLES, 216 , vertex_buffer_data, color_buffer_data, GL_FILL);
-  vao->trans[0]=x; vao->trans[1]=y; vao->trans[2]=0; vao->sizex=a; vao->sizey=b;
-  vao->rotate_angle=angle; vao->starttime=glfwGetTime();vao->vx=0; vao->vy=0;
-  return vao;
-}
 
 void checkkeys()
 {
@@ -425,24 +266,6 @@ void checkkeys()
     canon[0].trans[1]--; canon[1].trans[1]--; stand[0].trans[1]--; stand[1].trans[1]--;
     stand[2]=*create_rectangle(stand[1].trans[0],(stand[1].trans[1]-400)/2,10,(stand[1].trans[1]+400)/2,0,0,0,0);
   }
-}
-void construct(VAO x)
-{
-  glUseProgram (programID);
-  glm::vec3 eye ( 5*cos(camera_rotation_angle*M_PI/180.0f), 0, 5*sin(camera_rotation_angle*M_PI/180.0f) );
-  glm::vec3 target (0, 0, 0);
-  glm::vec3 up (0, 1, 0);
-  Matrices.view = glm::lookAt(glm::vec3(0,0,3), glm::vec3(0,0,0), glm::vec3(0,1,0)); // Fixed camera for 2D (ortho) in XY plane
-  glm::mat4 VP = Matrices.projection * Matrices.view;
-  glm::mat4 MVP;	// MVP = Projection * View * Model
-  Matrices.model = glm::mat4(1.0f);
-  glm::mat4 translateobject = glm::translate (glm::vec3(x.trans[0],x.trans[1],x.trans[2])); // glTranslatef
-  glm::mat4 rotateobject = glm::rotate((float)(x.rotate_angle*M_PI/180.0f), glm::vec3(0,0,1));  // rotate about vector (1,0,0)
-  glm::mat4 objectsTransform = translateobject * rotateobject;
-  Matrices.model *= objectsTransform;
-  MVP = VP * Matrices.model; // MVP = p * V * M
-  glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
-  draw3DObject(&x);
 }
 
 void checkpower()
