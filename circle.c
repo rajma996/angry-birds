@@ -1,6 +1,6 @@
 #include "circle.h"
 
-VAO* create_circle(float x,float y,float a,float b,float angle,float red,float green , float blue)
+VAO* create_circle(float x,float y,float a,float b,float angle,float red,float green , float blue,float vx,float vy)
 {
   GLfloat vertex_buffer_data[650];
   int i=0,j=0;
