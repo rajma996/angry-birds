@@ -17,7 +17,7 @@ using namespace std;
 #include "rectangle.h"
 #include "circle.h"
 #include "score.h"
-// #include "targets.h"
+#include "targets.h"
 vector<VAO> canon;
 int power;
 bool keys[26];
@@ -327,8 +327,8 @@ void draw ()
    }
 	 move_balls();
 	 draw_balls();
+	//  score_value++;
   loop(i,0,power_arr.size()) construct(power_arr[i]);
-	score_value++;
 	if(score_value==0) {  display_digit(0,570,350); display_score(); }
 	else
 	{
@@ -349,6 +349,9 @@ void draw ()
 			display_score();
 		}
 	}
+	set_targets();
+	move_targets();
+	draw_targets();
 }
 
 /* Initialise glfw window, I/O callbacks and the renderer to use */
@@ -403,9 +406,9 @@ GLFWwindow* initGLFW (int width, int height)
 /* Add all the models to be created here */
 void createobstructions()
 {
-  obstructions.push_back(*create_rectangle(-300,rand()%300,10,50,0,0,0,0,0,rand()%10*(rand()%2&2?1:-1)));
-  obstructions.push_back(*create_rectangle(-250,rand()%300-300,10,50,0,0,1,0,0,rand()%10*(rand()%2&2?1:-1)));
-  obstructions.push_back(*create_rectangle(-200,rand()%300-150,10,50,0,0,0,1,0,rand()%10*(rand()%2&2?1:-1)));
+  obstructions.push_back(*create_rectangle(-300,rand()%300,10,50,0,0,0,0,0,rand()%4));
+  obstructions.push_back(*create_rectangle(-250,rand()%300-300,10,50,0,0,1,0,0,rand()%4));
+  obstructions.push_back(*create_rectangle(-200,rand()%300-150,10,50,0,0,0,1,0,rand()%4));
   loop(i,0,obstructions.size())
   {
     int temp=rand()%35;

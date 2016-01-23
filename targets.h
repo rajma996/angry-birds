@@ -2,6 +2,8 @@
 #define target_H
 
 void set_targets();
+void move_targets();
+void draw_targets();
 
-#include "target.c"
+#include "targets.c"
 #endif
