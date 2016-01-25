@@ -22,12 +22,12 @@ void move_balls()
   for (int i=0;i<balls.size();i++)
   {
     // printf("%f %f\n",balls[i].vx,balls[i].vy);
-    if(balls[i].trans[0]<-570 || balls[i].trans[0]>570 || balls[i].trans[1]<-300 || balls[i].trans[1]>410) {  erase_ball(i);}
+    if(balls[i].trans[0]<-1040 || balls[i].trans[0]>1040 || balls[i].trans[1]<-600 || balls[i].trans[1]>820) {  erase_ball(i);}
     float etime=glfwGetTime()-balls[i].starttime;
     balls[i].trans[0]=balls[i].trans[0]+balls[i].vx*(etime)/2;
     balls[i].trans[1]=balls[i].trans[1]+balls[i].vy*(etime)-(etime)*(etime);
     balls[i].vy=balls[i].vy-etime;
-    if(balls[i].trans[1]-balls[i].sizey<=-300)
+    if(balls[i].trans[1]-balls[i].sizey<=-600)
     {
       //  balls[i].vy=-0.7*balls[i].vy; balls[i].starttime=glfwGetTime(); balls[i].trans[1]=-290;
        erase_ball(i);
@@ -62,7 +62,7 @@ void move_balls()
     }
     loop(j,0,rocks.size())
     {
-      float x_cor = rocks[j].trans[0]; float y_cor_up=400; float y_cor_down = rocks[j].trans[1];
+      float x_cor = rocks[j].trans[0]; float y_cor_up=800; float y_cor_down = rocks[j].trans[1];
       if(balls[i].trans[1]>=y_cor_down && balls[i].trans[1]<=y_cor_up && balls[i].trans[0]+balls[i].sizex>=x_cor-20 && balls[i].trans[0]+balls[i].sizex<=x_cor+20)
       {
         threads[j]=*create_rectangle(threads[j].trans[0],threads[j].trans[1],threads[j].sizex,threads[j].sizey,0,0.2f,0.2f,0.2f,0,0);

@@ -276,7 +276,7 @@ void reshapeWindow (GLFWwindow* window, int width, int height)
 	glViewport (0, 0, (GLsizei) fbwidth, (GLsizei) fbheight);
 
 
-    Matrices.projection = glm::ortho(-650*ortho_x+ortho_x_shift, 650*ortho_x+ortho_x_shift, -400*ortho_y+ortho_y_shift, 400*ortho_y+ortho_y_shift, 0.1f, 500.0f);
+    Matrices.projection = glm::ortho(-1300*ortho_x+ortho_x_shift, 1300*ortho_x+ortho_x_shift, -800*ortho_y+ortho_y_shift, 800*ortho_y+ortho_y_shift, 0.1f, 500.0f);
 }
 
 // Creates the triangle object used in this sample code
@@ -291,15 +291,15 @@ void checkkeys()
   if(keys[GLFW_KEY_R]==1) releaseball();
   if(keys[GLFW_KEY_D]==1 ) canon[0].rotate_angle++;
   if(keys[GLFW_KEY_A]==1 ) canon[0].rotate_angle--;
-  if(keys[GLFW_KEY_W]==1 && canon[0].trans[1]<250 && canon[0].trans[0]>=-570 && canon[0].trans[0]<-530)
+  if(keys[GLFW_KEY_W]==1 && canon[0].trans[1]<500 && canon[0].trans[0]>=-1040 && canon[0].trans[0]<-1060)
   {
     canon[0].trans[1]++; canon[1].trans[1]++; stand[0].trans[1]++; stand[1].trans[1]++;
-    stand[2]=*create_rectangle(stand[1].trans[0],(stand[1].trans[1]-400)/2,10,(stand[1].trans[1]+400)/2,0,1,1,1,0,0);
+    stand[2]=*create_rectangle(stand[1].trans[0],(stand[1].trans[1]-800)/2,10,(stand[1].trans[1]+800)/2,0,1,1,1,0,0);
   }
-  if(keys[GLFW_KEY_S]==1 && canon[0].trans[1]>-250 && canon[0].trans[0]>=-570 && canon[0].trans[0]<-530)
+  if(keys[GLFW_KEY_S]==1 && canon[0].trans[1]>-500 && canon[0].trans[0]>=-1040 && canon[0].trans[0]<-1060)
   {
     canon[0].trans[1]--; canon[1].trans[1]--; stand[0].trans[1]--; stand[1].trans[1]--;
-    stand[2]=*create_rectangle(stand[1].trans[0],(stand[1].trans[1]-400)/2,10,(stand[1].trans[1]+400)/2,0,1,1,1,0,0);
+    stand[2]=*create_rectangle(stand[1].trans[0],(stand[1].trans[1]-800)/2,10,(stand[1].trans[1]+800)/2,0,1,1,1,0,0);
   }
 	if(keys[GLFW_KEY_UP]) { ortho_x*=1.01; ortho_y*=1.01; }
 	if(keys[GLFW_KEY_DOWN] && ortho_x>1) { ortho_x/=1.01; ortho_y/=1.01; }
@@ -313,7 +313,7 @@ void checkpower()
 	if(keys[GLFW_KEY_P]==1 && power<100)
 	{
 		power++;
-		power_arr.push_back(*create_rectangle(620,-392+i*8,10,4,0,1-(float)i/100,1-(float)i/100,1-(float)i/100,0,0));
+		power_arr.push_back(*create_rectangle(1240,-784+i*16,10,4,0,1-(float)i/100,1-(float)i/100,1-(float)i/100,0,0));
 	}
 	else if(keys[GLFW_KEY_O] && power>0)
 	{
@@ -345,8 +345,8 @@ void draw ()
   loop(i,0,obstructions.size())
   {
     // if(obstruction[i].trans)
-    if(obstructions[i].vy>0 && obstructions[i].trans[1]+obstructions[i].sizey>=390) {obstructions[i].vy*=-1; obstructions[i].starttime=glfwGetTime();}
-    else if(obstructions[i].vy<0 && obstructions[i].trans[1]-obstructions[i].sizey<=-390) {obstructions[i].vy*=-1; obstructions[i].starttime=glfwGetTime();}
+    if(obstructions[i].vy>0 && obstructions[i].trans[1]+obstructions[i].sizey>=780) {obstructions[i].vy*=-1; obstructions[i].starttime=glfwGetTime();}
+    else if(obstructions[i].vy<0 && obstructions[i].trans[1]-obstructions[i].sizey<=-780) {obstructions[i].vy*=-1; obstructions[i].starttime=glfwGetTime();}
     obstructions[i].trans[1]=obstructions[i].trans[1]+(obstructions[i].vy)*(glfwGetTime()-obstructions[i].starttime);
      construct(obstructions[i]);
     //  sleep(10);
@@ -357,23 +357,23 @@ void draw ()
 	 draw_balls();
 	//  score_value++;
   loop(i,0,power_arr.size()) construct(power_arr[i]);
-	if(score_value==0) {  display_digit(0,570,350); display_score(); }
+	if(score_value==0) {  display_digit(0,1140,700); display_score(); }
 	else
 	{
 		int score_temp = score_value,neg_flag=0;
 		if(score_value<0) { neg_flag = 1 ; score_temp*=-1; }
-		int temp_x = 570;
+		int temp_x = 1140;
 		while(score_temp!=0)
 		{
 				score.clear();
-				display_digit(score_temp%10,temp_x,350);
+				display_digit(score_temp%10,temp_x,700);
 				score_temp/=10; temp_x-=(2*lengthx+10);
 				display_score();
 		}
 		if(neg_flag==1)
 		{
 			score.clear();
-			rectangle4(temp_x,350);
+			rectangle4(temp_x,700);
 			display_score();
 		}
 	}
@@ -434,8 +434,8 @@ GLFWwindow* initGLFW (int width, int height)
 /* Add all the models to be created here */
 void createobstructions()
 {
-  obstructions.push_back(*create_rectangle(-300,rand()%300,10,50,0,1,1,1,0,3));
-  obstructions.push_back(*create_rectangle(-250,rand()%300-300,10,50,0,1,1,1,0,-3));
+  obstructions.push_back(*create_rectangle(-600,rand()%600,10,50,0,1,1,1,0,3));
+  obstructions.push_back(*create_rectangle(-500,rand()%600-600,10,50,0,1,1,1,0,-3));
   // obstructions.push_back(*create_rectangle(-200,rand()%300-150,10,50,0,0,0,1,0,0));
 }
 void initGL (GLFWwindow* window, int width, int height)
@@ -447,13 +447,13 @@ void initGL (GLFWwindow* window, int width, int height)
 	ortho_x = 1;
 	ortho_y = 1;
 	ortho_x_shift=0; ortho_y_shift=0;
-  stand.push_back(*create_rectangle(-570,-300,10,30,0,0.8,0.8,0.8,0,0));
-  stand.push_back(*create_rectangle(-570,-340,50,10,0,1,1,1,0,0));
-  stand.push_back(*create_rectangle(-570,-370,10,60,0,1,1,1,0,0));
-  canon.push_back(*create_rectangle(-570,-250,80,20,45,1,1,1,0,0));
-  canon.push_back(*create_circle(-570,-250,40,40,0,1,1,1,0,0));
+  stand.push_back(*create_rectangle(-1040,-600,10,30,0,0.8,0.8,0.8,0,0));
+  stand.push_back(*create_rectangle(-1040,-670,50,10,0,1,1,1,0,0));
+  stand.push_back(*create_rectangle(-1040,-670,10,60,0,1,1,1,0,0));
+  canon.push_back(*create_rectangle(-1040,-500,80,20,45,1,1,1,0,0));
+  canon.push_back(*create_circle(-1040,-500,40,40,0,1,1,1,0,0));
   power = 50;
-	loop(i,0,50) power_arr.push_back(*create_rectangle(620,-392+i*8,10,4,0,1-(float)i/100,1-(float)i/100,1-(float)i/100,0,0));
+	loop(i,0,50) power_arr.push_back(*create_rectangle(1240,-784+i*16,10,4,0,1-(float)i/100,1-(float)i/100,1-(float)i/100,0,0));
 	score_value = 0;
   createobstructions();
 	set_power_projectile(3);
@@ -501,7 +501,7 @@ int main (int argc, char** argv)
         // Poll for Keyboard and mouse events
         glfwPollEvents();
 				glfwGetCursorPos(window,&mouse_x,&mouse_y);
-				mouse_x-=80; mouse_y-=580; mouse_y*=-1;
+				mouse_x-=160; mouse_y-=1160; mouse_y*=-1;
         // Control based on time (Time based transformation like 5 degrees rotation every 0.5s)
         current_time = glfwGetTime(); // Time in seconds
         if ((current_time - last_update_time) >= 0.5) { // atleast 0.5s elapsed since last frame

@@ -81,7 +81,7 @@ void construct(VAO x)
   glm::vec3 target (0, 0, 0);
   glm::vec3 up (0, 1, 0);
   Matrices.view = glm::lookAt(glm::vec3(0,0,3), glm::vec3(0,0,0), glm::vec3(0,1,0)); // Fixed camera for 2D (ortho) in XY plane
-  Matrices.projection = glm::ortho(-650*ortho_x+ortho_x_shift, 650*ortho_x+ortho_x_shift, -400*ortho_y+ortho_y_shift, 400*ortho_y+ortho_y_shift, 0.1f, 500.0f);
+  Matrices.projection = glm::ortho(-1300*ortho_x+ortho_x_shift, 1300*ortho_x+ortho_x_shift, -800*ortho_y+ortho_y_shift, 800*ortho_y+ortho_y_shift, 0.1f, 500.0f);
   glm::mat4 VP = Matrices.projection * Matrices.view;
   glm::mat4 MVP;	// MVP = Projection * View * Model
   Matrices.model = glm::mat4(1.0f);
