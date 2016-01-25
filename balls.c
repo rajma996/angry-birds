@@ -5,11 +5,12 @@ void releaseball()
 {
   if(balls.size()==0 && power>0)
   {
+    printf("raj\n" );
 		if(keys[GLFW_KEY_L]==1 && projectile_state==1) {keys[GLFW_KEY_L]=0; projectile_state = 0; power_projectile--;}
     balls.push_back(*create_rectangle(canon[1].trans[0],canon[1].trans[1],20,2,canon[1].rotate_angle,1,1,1,0,0));
     int t = balls.size();
-    balls[t-1].vx=55*cos(canon[0].rotate_angle*M_PI/180)*((float)power/66);
-    balls[t-1].vy=40*sin(canon[0].rotate_angle*M_PI/180)*((float)power/66);
+    balls[t-1].vx=110*cos(canon[0].rotate_angle*M_PI/180)*((float)power/66);
+    balls[t-1].vy=80*sin(canon[0].rotate_angle*M_PI/180)*((float)power/66);
   }
 }
 void erase_ball(int i)
@@ -22,7 +23,7 @@ void move_balls()
   for (int i=0;i<balls.size();i++)
   {
     // printf("%f %f\n",balls[i].vx,balls[i].vy);
-    if(balls[i].trans[0]<-1040 || balls[i].trans[0]>1040 || balls[i].trans[1]<-600 || balls[i].trans[1]>820) {  erase_ball(i);}
+    if(balls[i].trans[0]<-1140 || balls[i].trans[0]>1140 || balls[i].trans[1]<-600 || balls[i].trans[1]>820) {  erase_ball(i);}
     float etime=glfwGetTime()-balls[i].starttime;
     balls[i].trans[0]=balls[i].trans[0]+balls[i].vx*(etime)/2;
     balls[i].trans[1]=balls[i].trans[1]+balls[i].vy*(etime)-(etime)*(etime);

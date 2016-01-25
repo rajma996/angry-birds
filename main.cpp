@@ -291,12 +291,12 @@ void checkkeys()
   if(keys[GLFW_KEY_R]==1) releaseball();
   if(keys[GLFW_KEY_D]==1 ) canon[0].rotate_angle++;
   if(keys[GLFW_KEY_A]==1 ) canon[0].rotate_angle--;
-  if(keys[GLFW_KEY_W]==1 && canon[0].trans[1]<500 && canon[0].trans[0]>=-1040 && canon[0].trans[0]<-1060)
+  if(keys[GLFW_KEY_W]==1 && canon[0].trans[1]<500 && canon[0].trans[0]>=-1140 && canon[0].trans[0]<-1060)
   {
     canon[0].trans[1]++; canon[1].trans[1]++; stand[0].trans[1]++; stand[1].trans[1]++;
     stand[2]=*create_rectangle(stand[1].trans[0],(stand[1].trans[1]-800)/2,10,(stand[1].trans[1]+800)/2,0,1,1,1,0,0);
   }
-  if(keys[GLFW_KEY_S]==1 && canon[0].trans[1]>-500 && canon[0].trans[0]>=-1040 && canon[0].trans[0]<-1060)
+  if(keys[GLFW_KEY_S]==1 && canon[0].trans[1]>-500 && canon[0].trans[0]>=-1140 && canon[0].trans[0]<-1060)
   {
     canon[0].trans[1]--; canon[1].trans[1]--; stand[0].trans[1]--; stand[1].trans[1]--;
     stand[2]=*create_rectangle(stand[1].trans[0],(stand[1].trans[1]-800)/2,10,(stand[1].trans[1]+800)/2,0,1,1,1,0,0);
@@ -313,7 +313,7 @@ void checkpower()
 	if(keys[GLFW_KEY_P]==1 && power<100)
 	{
 		power++;
-		power_arr.push_back(*create_rectangle(1240,-784+i*16,10,4,0,1-(float)i/100,1-(float)i/100,1-(float)i/100,0,0));
+		power_arr.push_back(*create_rectangle(1240,-784+i*16,10,8,0,1-(float)i/100,1-(float)i/100,1-(float)i/100,0,0));
 	}
 	else if(keys[GLFW_KEY_O] && power>0)
 	{
@@ -447,13 +447,13 @@ void initGL (GLFWwindow* window, int width, int height)
 	ortho_x = 1;
 	ortho_y = 1;
 	ortho_x_shift=0; ortho_y_shift=0;
-  stand.push_back(*create_rectangle(-1040,-600,10,30,0,0.8,0.8,0.8,0,0));
-  stand.push_back(*create_rectangle(-1040,-670,50,10,0,1,1,1,0,0));
-  stand.push_back(*create_rectangle(-1040,-670,10,60,0,1,1,1,0,0));
-  canon.push_back(*create_rectangle(-1040,-500,80,20,45,1,1,1,0,0));
-  canon.push_back(*create_circle(-1040,-500,40,40,0,1,1,1,0,0));
+  stand.push_back(*create_rectangle(-1140,-600,10,60,0,0.8,0.8,0.8,0,0));
+  stand.push_back(*create_rectangle(-1140,-680,50,10,0,1,1,1,0,0));
+  stand.push_back(*create_rectangle(-1140,-740,10,60,0,1,1,1,0,0));
+  canon.push_back(*create_rectangle(-1140,-500,80,20,45,1,1,1,0,0));
+  canon.push_back(*create_circle(-1140,-500,40,40,0,1,1,1,0,0));
   power = 50;
-	loop(i,0,50) power_arr.push_back(*create_rectangle(1240,-784+i*16,10,4,0,1-(float)i/100,1-(float)i/100,1-(float)i/100,0,0));
+	loop(i,0,50) power_arr.push_back(*create_rectangle(1240,-784+i*16,10,8,0,1-(float)i/100,1-(float)i/100,1-(float)i/100,0,0));
 	score_value = 0;
   createobstructions();
 	set_power_projectile(3);
