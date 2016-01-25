@@ -13,6 +13,10 @@ using namespace std;
 #include <glm/gtc/matrix_transform.hpp>
 
 
+float ortho_x;
+float ortho_y;
+float ortho_x_shift;
+float ortho_y_shift;
 #include "construct3D.h"
 #include "rectangle.h"
 #include "circle.h"
@@ -20,9 +24,10 @@ using namespace std;
 #include "targets.h"
 vector<VAO> canon;
 int power;
-bool keys[26];
+bool keys[500];
 vector<VAO> obstructions;
 #include "show_projectile.h"
+#include "rocks.c"
 #include "balls.h"
 
 
@@ -127,37 +132,50 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
     if (action == GLFW_RELEASE) {
         switch (key) {
           case GLFW_KEY_X:
-                keys['X'-'A']=0;
+                keys[GLFW_KEY_X]=0;
                 break;
           case GLFW_KEY_Z:
-                  keys['Z'-'A']=0;
+                  keys[GLFW_KEY_Z]=0;
                   break;
           case GLFW_KEY_R:
-                keys['R'-'A']=0;
+                keys[GLFW_KEY_R]=0;
                   break;
           case GLFW_KEY_D:
-                keys['D'-'A']=0;
+                keys[GLFW_KEY_D]=0;
                 break;
           case GLFW_KEY_A:
-                keys['A'-'A']=0;
+                keys[GLFW_KEY_A]=0;
                 break;
           case GLFW_KEY_W:
-                keys['W'-'A']=0;
+                keys[GLFW_KEY_W]=0;
                 break;
           case GLFW_KEY_S:
-                keys['S'-'A']=0;
+                keys[GLFW_KEY_S]=0;
                 break;
 					case GLFW_KEY_P:
-								keys['P'-'A']=0;
+								keys[GLFW_KEY_P]=0;
 								break;
 					case GLFW_KEY_O:
-								keys['O'-'A']=0;
+								keys[GLFW_KEY_O]=0;
 								break;
 					case GLFW_KEY_L:
 								if(power_projectile>0 && projectile_state == 1)
 										power_projectile --;
-								keys['L'-'A']=0;
+								keys[GLFW_KEY_L]=0;
 								break;
+					case GLFW_KEY_UP:
+								keys[GLFW_KEY_UP]=0;
+								break;
+					case GLFW_KEY_DOWN:
+								keys[GLFW_KEY_DOWN]=0;
+								break;
+					case GLFW_KEY_LEFT:
+								keys[GLFW_KEY_LEFT]=0;
+								break;
+  				case GLFW_KEY_RIGHT:
+	  						keys[GLFW_KEY_RIGHT]=0;
+								break;
+
           default:
                 break;
         }
@@ -165,40 +183,52 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
     else if (action == GLFW_PRESS) {
         switch (key) {
           case GLFW_KEY_X:
-                keys['X'-'A']=1;
+                keys[GLFW_KEY_A]=1;
                 break;
           case GLFW_KEY_Z:
-                  keys['Z'-'A']=1;
+                  keys[GLFW_KEY_Z]=1;
                   break;
           case GLFW_KEY_R:
-                  keys['R'-'A']=1;
+                  keys[GLFW_KEY_R]=1;
                   break;
           case GLFW_KEY_D:
-                keys['D'-'A']=1;
+                keys[GLFW_KEY_D]=1;
                 break;
           case GLFW_KEY_A:
-                keys['A'-'A']=1;
+                keys[GLFW_KEY_A]=1;
                 break;
           case GLFW_KEY_W:
-                keys['W'-'A']=1;
+                keys[GLFW_KEY_W]=1;
                 break;
           case GLFW_KEY_S:
-                keys['S'-'A']=1;
+                keys[GLFW_KEY_S]=1;
                 break;
           case GLFW_KEY_T:
                 if(balls.size()!=0)
                   balls.erase(balls.begin());
                   break;
 					case GLFW_KEY_P:
-								keys['P'-'A']=1;
+								keys[GLFW_KEY_P]=1;
 								break;
 					case GLFW_KEY_O:
-								keys['O'-'A']=1;
+								keys[GLFW_KEY_O]=1;
 								break;
 					case GLFW_KEY_L:
 								if(power_projectile>0)
-									{ keys['L'-'A']=1; projectile_state = 1 ; }
+									{ keys[GLFW_KEY_L]=1; projectile_state = 1 ; }
 								break;
+					case GLFW_KEY_UP:
+							keys[GLFW_KEY_UP]=1;
+							break;
+					case GLFW_KEY_DOWN:
+							keys[GLFW_KEY_DOWN]=1;
+							break;
+  				case GLFW_KEY_LEFT:
+							keys[GLFW_KEY_LEFT]=1;
+							break;
+					case GLFW_KEY_RIGHT:
+							keys[GLFW_KEY_RIGHT]=1;
+							break;
             case GLFW_KEY_ESCAPE:
                 quit(window);
                 break;
@@ -245,16 +275,8 @@ void reshapeWindow (GLFWwindow* window, int width, int height)
 	// sets the viewport of openGL renderer
 	glViewport (0, 0, (GLsizei) fbwidth, (GLsizei) fbheight);
 
-	// set the projection matrix as perspective
-	/* glMatrixMode (GL_PROJECTION);
-	   glLoadIdentity ();
-	   gluPerspective (fov, (GLfloat) fbwidth / (GLfloat) fbheight, 0.1, 500.0); */
-	// Store the projection matrix in a variable for future use
-    // Perspective projection for 3D views
-    // Matrices.projection = glm::perspective (fov, (GLfloat) fbwidth / (GLfloat) fbheight, 0.1f, 500.0f);
 
-    // Ortho projection for 2D views
-    Matrices.projection = glm::ortho(-650.0f, 650.0f, -400.0f, 400.0f, 0.1f, 500.0f);
+    Matrices.projection = glm::ortho(-650*ortho_x+ortho_x_shift, 650*ortho_x+ortho_x_shift, -400*ortho_y+ortho_y_shift, 400*ortho_y+ortho_y_shift, 0.1f, 500.0f);
 }
 
 // Creates the triangle object used in this sample code
@@ -266,30 +288,34 @@ void checkkeys()
 {
   // if(keys['X'-'A']==1) canon[0].rotate_angle++;
   // if(keys['Z'-'A']==1) canon[0].rotate_angle--;
-  if(keys['R'-'A']==1) releaseball();
-  if(keys['D'-'A']==1 ) canon[0].rotate_angle++;
-  if(keys['A'-'A']==1 ) canon[0].rotate_angle--;
-  if(keys['W'-'A']==1 && canon[0].trans[1]<250 && canon[0].trans[0]>=-570 && canon[0].trans[0]<-530)
+  if(keys[GLFW_KEY_R]==1) releaseball();
+  if(keys[GLFW_KEY_D]==1 ) canon[0].rotate_angle++;
+  if(keys[GLFW_KEY_A]==1 ) canon[0].rotate_angle--;
+  if(keys[GLFW_KEY_W]==1 && canon[0].trans[1]<250 && canon[0].trans[0]>=-570 && canon[0].trans[0]<-530)
   {
     canon[0].trans[1]++; canon[1].trans[1]++; stand[0].trans[1]++; stand[1].trans[1]++;
-    stand[2]=*create_rectangle(stand[1].trans[0],(stand[1].trans[1]-400)/2,10,(stand[1].trans[1]+400)/2,0,0,0,0,0,0);
+    stand[2]=*create_rectangle(stand[1].trans[0],(stand[1].trans[1]-400)/2,10,(stand[1].trans[1]+400)/2,0,1,1,1,0,0);
   }
-  if(keys['S'-'A']==1 && canon[0].trans[1]>-250 && canon[0].trans[0]>=-570 && canon[0].trans[0]<-530)
+  if(keys[GLFW_KEY_S]==1 && canon[0].trans[1]>-250 && canon[0].trans[0]>=-570 && canon[0].trans[0]<-530)
   {
     canon[0].trans[1]--; canon[1].trans[1]--; stand[0].trans[1]--; stand[1].trans[1]--;
-    stand[2]=*create_rectangle(stand[1].trans[0],(stand[1].trans[1]-400)/2,10,(stand[1].trans[1]+400)/2,0,0,0,0,0,0);
+    stand[2]=*create_rectangle(stand[1].trans[0],(stand[1].trans[1]-400)/2,10,(stand[1].trans[1]+400)/2,0,1,1,1,0,0);
   }
+	if(keys[GLFW_KEY_UP]) { ortho_x*=1.01; ortho_y*=1.01; }
+	if(keys[GLFW_KEY_DOWN] && ortho_x>1) { ortho_x/=1.01; ortho_y/=1.01; }
+	if(keys[GLFW_KEY_LEFT]) { ortho_x_shift++;  }
+	if(keys[GLFW_KEY_RIGHT]) { ortho_x_shift--;}
 }
 
 void checkpower()
 {
   int i=power_arr.size()-1;
-	if(keys['P'-'A']==1 && power<100)
+	if(keys[GLFW_KEY_P]==1 && power<100)
 	{
 		power++;
-  	power_arr.push_back(*create_rectangle(620,-392+i*8,10,4,0,(float)i/100,0,(100-(float)i)/100,0,0));
+		power_arr.push_back(*create_rectangle(620,-392+i*8,10,4,0,1-(float)i/100,1-(float)i/100,1-(float)i/100,0,0));
 	}
-	else if (keys['O'-'A']==1 && power>0)
+	else if(keys[GLFW_KEY_O] && power>0)
 	{
 		power--;
 		power_arr.pop_back();
@@ -319,12 +345,14 @@ void draw ()
   loop(i,0,obstructions.size())
   {
     // if(obstruction[i].trans)
-    if(obstructions[i].vy>0 && obstructions[i].trans[1]+obstructions[i].sizey>=300) {obstructions[i].vy*=-1; obstructions[i].starttime=glfwGetTime();}
-    else if(obstructions[i].vy<0 && obstructions[i].trans[1]-obstructions[i].sizey<=-300) {obstructions[i].vy*=-1; obstructions[i].starttime=glfwGetTime();}
+    if(obstructions[i].vy>0 && obstructions[i].trans[1]+obstructions[i].sizey>=390) {obstructions[i].vy*=-1; obstructions[i].starttime=glfwGetTime();}
+    else if(obstructions[i].vy<0 && obstructions[i].trans[1]-obstructions[i].sizey<=-390) {obstructions[i].vy*=-1; obstructions[i].starttime=glfwGetTime();}
     obstructions[i].trans[1]=obstructions[i].trans[1]+(obstructions[i].vy)*(glfwGetTime()-obstructions[i].starttime);
      construct(obstructions[i]);
     //  sleep(10);
    }
+	 move_rocks();
+	 draw_rocks();
 	 move_balls();
 	 draw_balls();
 	//  score_value++;
@@ -406,27 +434,26 @@ GLFWwindow* initGLFW (int width, int height)
 /* Add all the models to be created here */
 void createobstructions()
 {
-  obstructions.push_back(*create_rectangle(-300,rand()%300,10,50,0,0,0,0,0,rand()%4));
-  obstructions.push_back(*create_rectangle(-250,rand()%300-300,10,50,0,0,1,0,0,rand()%4));
-  obstructions.push_back(*create_rectangle(-200,rand()%300-150,10,50,0,0,0,1,0,rand()%4));
-  loop(i,0,obstructions.size())
-  {
-    int temp=rand()%35;
-    if(rand()%2==0) obstructions[i].vy=temp;
-    else obstructions[i].vy=-1*temp;
-  }
+  obstructions.push_back(*create_rectangle(-300,rand()%300,10,50,0,1,1,1,0,3));
+  obstructions.push_back(*create_rectangle(-250,rand()%300-300,10,50,0,1,1,1,0,-3));
+  // obstructions.push_back(*create_rectangle(-200,rand()%300-150,10,50,0,0,0,1,0,0));
 }
 void initGL (GLFWwindow* window, int width, int height)
 {
     /* Objects should be created before any other gl function and shaders */
 	// Create the models
   for (int i=0;i<26;i++) keys[i]=0;
-  stand.push_back(*create_rectangle(-570,-300,30,10,90,0,0,0,0,0));
-  stand.push_back(*create_rectangle(-570,-340,50,10,0,0,0,0,0,0));
-  stand.push_back(*create_rectangle(-570,-370,10,60,0,0,0,0,0,0));
-  canon.push_back(*create_rectangle(-570,-250,80,20,45,0,1,0,0,0));
-  canon.push_back(*create_circle(-570,-250,40,40,0,1,0,0,0,0));
-  power = 0;
+	set_rocks();
+	ortho_x = 1;
+	ortho_y = 1;
+	ortho_x_shift=0; ortho_y_shift=0;
+  stand.push_back(*create_rectangle(-570,-300,10,30,0,0.8,0.8,0.8,0,0));
+  stand.push_back(*create_rectangle(-570,-340,50,10,0,1,1,1,0,0));
+  stand.push_back(*create_rectangle(-570,-370,10,60,0,1,1,1,0,0));
+  canon.push_back(*create_rectangle(-570,-250,80,20,45,1,1,1,0,0));
+  canon.push_back(*create_circle(-570,-250,40,40,0,1,1,1,0,0));
+  power = 50;
+	loop(i,0,50) power_arr.push_back(*create_rectangle(620,-392+i*8,10,4,0,1-(float)i/100,1-(float)i/100,1-(float)i/100,0,0));
 	score_value = 0;
   createobstructions();
 	set_power_projectile(3);
