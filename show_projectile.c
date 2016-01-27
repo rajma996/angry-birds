@@ -18,13 +18,13 @@ void set_projectile()
   float ttime = 0;
   while(1)
   {
-    if(xpos<-1040 || xpos>1040 || ypos<-600 ) break;
+    if(xpos<-570 || xpos>570 || ypos<-300 ) break;
     xpos=xpos+vx*(ttime)/2;
     ypos=ypos+vy*(ttime)-(ttime)*(ttime);
     vy=vy-ttime;
-    if(ypos-10<=-600)
+    if(ypos-10<=-300)
     {
-       vy=-0.7*vy;  ypos=-580; ttime=0;
+       vy=-0.7*vy;  ypos=-290; ttime=0;
        if(vy<1.3) break;
     }
     ttime += 0.5;

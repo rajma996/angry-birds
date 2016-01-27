@@ -1,0 +1,24 @@
+
+Rules of the game:
+
+Score and power values are displayed on the right side.
+bubbles will be floating up and you need to hit them three times before they burst
+
+press r to release arrow
+
+avoid obstacles
+change mouse position to aim
+
+press w to move canon up and e to move down
+
+press f to increase power
+press s to decrease power
+
+press arrow kwys to zoom and translate to get better view 
+
+break the thread of the stones hanginh to releas them
+they will break all the bubbles on the path 
+
+and last but not hte least 
+
+ENJOY.

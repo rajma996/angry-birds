@@ -3,8 +3,7 @@
 
 
 int score_value;
-#define lengthx  10
-#define lengthy  2.5
+
 void rectangle1(float x,float y);
 void rectangle2(float x,float y);
 void rectangle3(float x,float y);

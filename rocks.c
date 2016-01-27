@@ -12,10 +12,10 @@ void set_rocks()
 {
   while(rocks.size()<3)
   {
-    float x_temp = rand()%1200;
-    float y_temp = rand()%60;
+    float x_temp = rand()%600;
+    float y_temp = rand()%30;
     rocks.push_back(*create_circle(x_temp,y_temp,50,50,0,0,0,0,0,0));
-    threads.push_back(*create_rectangle(x_temp,(y_temp+800)/2,0.5,(y_temp+800)/2,0,1,1,1,0,0));
+    threads.push_back(*create_rectangle(x_temp,(y_temp+400)/2,0.5,(y_temp+400)/2,0,1,1,1,0,0));
     rocks_status.push_back(0);
   }
 }
